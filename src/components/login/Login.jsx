@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Login.css"; // Import the CSS file
 import AuthImage from "../../assets/AuthImage.jpg"; // Import your image
-import { supabase } from "@supabase/auth-ui-shared";
+import { supabase } from "../../config/supabaseClient";
 import { useUser } from "../../Hooks/useUserStore";
 
 const LoginPage = () => {
@@ -114,4 +114,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-
