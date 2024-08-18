@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useActivity } from "../hooks/useActivityStore";
 import { useUser } from "../hooks/useUserStore";
 import loader from "../assets/loader.gif";
+
 function DistanceFinder() {
   const navigate = useNavigate();
   const [location, setLocation] = useState({ latitude: null, longitude: null });
@@ -25,10 +26,12 @@ function DistanceFinder() {
     Activity: state.Activity,
     setActivity: state.setActivity,
   }));
+
   const { user, setUser } = useUser((state) => ({
     user: state.user,
     setUser: state.setUser,
   }));
+
   useEffect(() => {
     const userData = sessionStorage.getItem("user");
     if (!userData) {
@@ -36,7 +39,7 @@ function DistanceFinder() {
     } else {
       setUser(JSON.parse(userData));
     }
-  }, [navigate]);
+  }, [navigate, setUser]);
 
   useEffect(() => {
     let interval;
@@ -48,45 +51,50 @@ function DistanceFinder() {
     return () => clearInterval(interval);
   }, [isCounting]);
 
-  const start = () => {
-    setIsCounting(true);
-  };
-  const pause = () => {
-    setIsCounting(false);
-  };
-  const minutes = Math.floor(secs / 60);
-  const seconds = Math.floor(secs % 60);
-
   useEffect(() => {
     const handleSuccess = (position) => {
       const { latitude, longitude } = position.coords;
-      setLocation({ latitude, longitude });
-      if (
-        prevLocation.latitude != null &&
-        prevLocation.longitude != null &&
-        prevLocation
-      ) {
-        if (prevLocation) {
+
+      if (isCounting) {
+        // Only update distance when counting
+        if (prevLocation.latitude != null && prevLocation.longitude != null) {
           const newDistance = getDistance(prevLocation, {
             latitude,
             longitude,
           });
-          setDistance((prev) => prev + newDistance);
-          setPrevLocation({ latitude, longitude });
+          setDistance((prev) => prev + newDistance / 1000);
         }
-      } else {
         setPrevLocation({ latitude, longitude });
       }
+
+      setLocation({ latitude, longitude });
     };
+
     const handleError = (err) => {
       console.log("Error getting location:", err);
     };
+
     if (navigator.geolocation) {
-      navigator.geolocation.watchPosition(handleSuccess, handleError);
+      navigator.geolocation.watchPosition(handleSuccess, handleError, {
+        enableHighAccuracy: true,
+        maximumAge: 10000,
+        timeout: 5000,
+      });
     } else {
       console.error("Geolocation is not supported by device or browser");
     }
-  }, [prevLocation]);
+  }, [isCounting, prevLocation]);
+
+  const start = () => {
+    setIsCounting(true);
+  };
+
+  const pause = () => {
+    setIsCounting(false);
+  };
+
+  const minutes = Math.floor(secs / 60);
+  const seconds = Math.floor(secs % 60);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -96,7 +104,7 @@ function DistanceFinder() {
       {
         user_id: user.id,
         activity_date: new Date().toISOString(),
-        running_time: 500,
+        running_time: secs,
         activity_type: Activity,
         distance: distance,
       },
@@ -110,15 +118,18 @@ function DistanceFinder() {
       setIsSuccess(true);
     }
   };
+
   const EndTracker = () => {
     setIsCounting(false);
     setSecs(0);
+    setDistance(0);
     setIsSuccess(false);
     navigate("/");
   };
+
   return (
     <div className="distance-finder">
-      <img src={map} />
+      <img src={map} alt="Map" />
       <div className="duration">
         <p>Duration</p>
         <h3>
@@ -126,12 +137,13 @@ function DistanceFinder() {
         </h3>
       </div>
       <div className="distance">
-        <p>distance</p>
-        <h3>{distance / 1000}</h3>
+        <p>Distance</p>
+        <h3>{(distance / 1000).toFixed(2)}</h3>
       </div>
       <div className="speed">
         <p>Pace</p>
-        <h3>{secs > 0 ? distance / secs : 0} m/s</h3>
+        <h3>{secs > 0 ? (distance / secs).toFixed(2) : 0} m/s</h3>{" "}
+        {/* Show pace in meters per second */}
       </div>
       <div className="buttons">
         {isCounting ? (
@@ -150,21 +162,17 @@ function DistanceFinder() {
       {modalIsOpen ? (
         <div className="modal-container">
           <div className="modal">
-            {isLoading ? (
+            {isLoading && (
               <div className="loader">
-                <img src={loader} className="loader-icon" />
+                <img src={loader} className="loader-icon" alt="Loading" />
                 <h2>Recording your data ....</h2>
               </div>
-            ) : (
-              ""
             )}
-            {isSuccess ? (
+            {isSuccess && (
               <div className="success">
                 <h2>Your data has successfully been recorded</h2>
                 <button onClick={EndTracker}>Close Tracker</button>
               </div>
-            ) : (
-              ""
             )}
           </div>
         </div>

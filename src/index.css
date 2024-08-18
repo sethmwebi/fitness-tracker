@@ -111,9 +111,12 @@ nav .link-list:hover {
   flex-wrap: wrap;
   padding: 30px 10px;
 }
+.totaldistance h2 {
+  font-size: 25px !important;
+}
 .single-tab {
   background-color: white;
-  width: fit-content;
+  width: 30%;
   padding: 15px;
   border-radius: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.123);
@@ -287,6 +290,52 @@ nav .link-list:hover {
   border-radius: 10px;
   margin: 10px auto;
 }
+.distance-info h2 {
+  font-size: 45px !important;
+}
+
+/* Distance Today */
+.fill-bar {
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+}
+.fill-bar .bar-2 {
+  margin: 10px;
+  width: 80px;
+  height: 102px;
+  border: 1px solid black;
+  border-radius: 10px;
+  position: relative;
+}
+.fill-bar .bar-2 .progress {
+  position: absolute;
+  /* height: 100px; */
+  width: 100%;
+  bottom: 0;
+  background-color: var(--melon);
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.fill-bar span {
+  font-weight: 700;
+}
+.today-distance {
+  text-align: center;
+}
+.today-distance span {
+  font-weight: 700;
+}
+.pie-chart {
+  margin: 0 auto;
+}
+@media only screen and (max-width: 1000px) and (min-width: 768px) {
+  .single-tab {
+    width: 44%;
+  }
+}
 @media only screen and (max-width: 768px) {
   .dashboard-tab {
     flex-direction: column;
@@ -300,5 +349,8 @@ nav .link-list:hover {
   .bar-graphs .singleBar {
     width: 18px;
     flex-wrap: nowrap;
+  }
+  .distance-finder img {
+    width: 100%;
   }
 }
