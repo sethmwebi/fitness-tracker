@@ -4,6 +4,8 @@ import "./index.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Profile from "./components/Profile.jsx";
 import LoginPage from "./components/login/Login.jsx";
+import DistanceToday from "./components/DistanceToday.jsx";
+import DistanceFinder from "./components/DistanceFinder.jsx";
 
 const router = createBrowserRouter([
   {
@@ -17,6 +19,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+  },
+  {
+    path: "/distance",
+    element: <DistanceFinder />,
   },
 ]);
 
